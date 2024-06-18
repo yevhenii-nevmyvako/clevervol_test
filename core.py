@@ -7,9 +7,10 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from const import CrawlerResultColumn
+
 load_dotenv()
 
-client = OpenAI(api_key=os.getenv('API_KEY'))
+client = OpenAI(api_key=os.getenv("API_KEY"))
 
 
 def generate_summary(content: str) -> str:
@@ -54,9 +55,9 @@ def crawl_website(url: str, limit: int) -> list:
     soup = BeautifulSoup(response.content, "html.parser")
     pages = [url]
 
-    for link in soup.find_all('a', href=True):
-        href = link['href']
-        if href.startswith('/') and not href.startswith('//'):
+    for link in soup.find_all("a", href=True):
+        href = link["href"]
+        if href.startswith("/") and not href.startswith("//"):
             href = url + href
         if url in href and href not in pages:
             pages.append(href)
@@ -111,5 +112,5 @@ def crawler(url: str, limit: int, dst_filepath: str) -> None:
         })
 
     df = pd.DataFrame(data)
-    df.to_csv(dst_filepath, index=False, encoding='utf-8-sig')
+    df.to_csv(dst_filepath, index=False, encoding="utf-8-sig")
     print(f"Data save to {dst_filepath}")

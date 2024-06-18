@@ -1,5 +1,5 @@
 class CrawlerResultColumn:
-    PAGE_URL = 'Page URL'
-    TITLE = 'Title'
-    DESCRIPTION = 'Description'
-    SUMMARY = 'Summary'
+    PAGE_URL = "Page URL"
+    TITLE = "Title"
+    DESCRIPTION = "Description"
+    SUMMARY = "Summary"
