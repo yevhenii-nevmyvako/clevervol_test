@@ -36,6 +36,26 @@ def generate_summary(content: str) -> str:
     return response.choices[0].message.content
 
 
+def get_meta_tags(page_url: str, scraper: dict) -> (str, str):
+    """Gets metadata for the tags.
+
+    Args:
+        page_url: Link to page url.
+        scraper: cloudscraper.
+
+    Returns:
+        title: Title of pages.
+        description: Description for the pages.
+
+    """
+    response = scraper.get(page_url)
+    soup = BeautifulSoup(response.content, "html.parser")
+    title = soup.find("title").text if soup.find("title") else "No title"
+    description = soup.find("meta", attrs={"name": "description"})
+    description = description["content"] if description else "No description"
+    return title, description
+
+
 def crawl_website(url: str, limit: int) -> list:
     """Crawles pages of website.
 
@@ -65,26 +85,6 @@ def crawl_website(url: str, limit: int) -> list:
                 break
 
     return pages
-
-
-def get_meta_tags(page_url: str, scraper: dict) -> (str, str):
-    """Gets metadata for the tags.
-
-    Args:
-        page_url: Link to page url.
-        scraper: cloudscraper.
-
-    Returns:
-        title: Title of pages.
-        description: Description for the pages.
-
-    """
-    response = scraper.get(page_url)
-    soup = BeautifulSoup(response.content, "html.parser")
-    title = soup.find("title").text if soup.find("title") else "No title"
-    description = soup.find("meta", attrs={"name": "description"})
-    description = description["content"] if description else "No description"
-    return title, description
 
 
 def crawler(url: str, limit: int, dst_filepath: str) -> None:
