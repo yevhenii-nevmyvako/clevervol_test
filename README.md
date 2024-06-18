@@ -1,6 +1,7 @@
 # clevervol_test
 
 Crawler for website and save data with creating openAI summery to csv filepath.
+use https://www.scrapingcourse.com/ecommerce/ for tests
 
 ### How install 
 
