@@ -115,6 +115,7 @@ def crawler(url: str, limit: int, dst_filepath: str) -> None:
         dst_filepath: path to destination csv file.
 
     """
+    logger.info(f"Starting crawler with base URL: {url} and limit: {limit}")
     pages = crawl_website(url, limit)
     scraper = cloudscraper.create_scraper()
 
@@ -130,6 +131,19 @@ def crawler(url: str, limit: int, dst_filepath: str) -> None:
             CrawlerResultColumn.SUMMARY: summary
         })
 
-    df = pd.DataFrame(data)
-    df.to_csv(dst_filepath, index=False, encoding="utf-8-sig")
+    formatted_data = []
+    campaign_name = "My Campaign"
+    ad_group_name = "My Ad Group"
+
+    for row in data:
+        formatted_data.append({
+            "Campaign": campaign_name,
+            "Ad Group": ad_group_name,
+            "Headline": row[CrawlerResultColumn.TITLE],
+            "Description": row[CrawlerResultColumn.SUMMARY],
+            "Page URL": row[CrawlerResultColumn.PAGE_URL]
+        })
+
+    df = pd.DataFrame(formatted_data)
+    df.to_csv(dst_filepath, index=False, encoding="utf-16", sep="\t")
     logger.info(f"Data saved to {dst_filepath}")
