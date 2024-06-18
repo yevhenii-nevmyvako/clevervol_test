@@ -51,8 +51,11 @@ def get_meta_tags(page_url: str, scraper: dict) -> (str, str):
     response = scraper.get(page_url)
     soup = BeautifulSoup(response.content, "html.parser")
     title = soup.find("title").text if soup.find("title") else "No title"
-    description = soup.find("meta", attrs={"name": "description"})
-    description = description["content"] if description else "No description"
+    title_tag = soup.find("h1", class_="product_title entry-title")
+    title = title_tag.text.strip() if title_tag else title
+    description_tag = soup.find("div", class_="woocommerce-product-details__short-description")
+    description = description_tag.text.strip() if description_tag else "No description"
+    print(f"Title: {title}, Description: {description}")
     return title, description
 
 
@@ -68,14 +71,14 @@ def crawl_website(url: str, limit: int) -> list:
 
     """
     scraper = cloudscraper.create_scraper()
-    response = scraper.get(url)
+    response = scraper.get(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
     if response.status_code != 200:
         raise Exception(f"Failed to access {url}")
 
     soup = BeautifulSoup(response.content, "html.parser")
     pages = [url]
 
-    for link in soup.find_all("a", href=True):
+    for link in soup.find_all("a", class_="woocommerce-LoopProduct-link woocommerce-loop-product__link", href=True):
         href = link["href"]
         if href.startswith("/") and not href.startswith("//"):
             href = url + href
