@@ -1,0 +1,11 @@
+.env
+.venv
+.idea/
+build/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+**__pycache__/
+.pytest_cache/
