@@ -15,6 +15,7 @@ pip install -e .
 ```
 
 ### How to run command:
+Add Open Ai API_KEY to .env.
 1. Script name.
 2. URL to website
 3. path to save data to csv format as path/to/dst_filepath.csv

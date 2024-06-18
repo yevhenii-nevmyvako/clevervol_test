@@ -1,11 +1,15 @@
+import os
+
 import cloudscraper
 import pandas as pd
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 from openai import OpenAI
 
 from const import CrawlerResultColumn
+load_dotenv()
 
-client = OpenAI(api_key='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')
+client = OpenAI(api_key=os.getenv('API_KEY'))
 
 
 def generate_summary(content: str) -> str:
