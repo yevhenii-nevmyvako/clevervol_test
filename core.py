@@ -1,3 +1,4 @@
+import logging
 import os
 
 import cloudscraper
@@ -7,6 +8,16 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from const import CrawlerResultColumn
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("crawler.log"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -49,13 +60,16 @@ def get_meta_tags(page_url: str, scraper: dict) -> (str, str):
 
     """
     response = scraper.get(page_url)
+    if response.status_code != 200:
+        raise Exception(f"Failed to access {page_url}")
+
     soup = BeautifulSoup(response.content, "html.parser")
     title = soup.find("title").text if soup.find("title") else "No title"
     title_tag = soup.find("h1", class_="product_title entry-title")
     title = title_tag.text.strip() if title_tag else title
     description_tag = soup.find("div", class_="woocommerce-product-details__short-description")
     description = description_tag.text.strip() if description_tag else "No description"
-    print(f"Title: {title}, Description: {description}")
+    logger.info(f"Title: {title}, Description: {description}")
     return title, description
 
 
@@ -78,7 +92,9 @@ def crawl_website(url: str, limit: int) -> list:
     soup = BeautifulSoup(response.content, "html.parser")
     pages = [url]
 
-    for link in soup.find_all("a", class_="woocommerce-LoopProduct-link woocommerce-loop-product__link", href=True):
+    for link in soup.find_all(
+            "a", class_="woocommerce-LoopProduct-link woocommerce-loop-product__link", href=True
+    ):
         href = link["href"]
         if href.startswith("/") and not href.startswith("//"):
             href = url + href
@@ -87,6 +103,7 @@ def crawl_website(url: str, limit: int) -> list:
             if len(pages) >= limit:
                 break
 
+    logger.info(f"Found {len(pages)} pages to process")
     return pages
 
 
@@ -104,7 +121,7 @@ def crawler(url: str, limit: int, dst_filepath: str) -> None:
 
     data = []
     for page in pages:
-        print(f"Processing page: {page}")
+        logger.info(f"Processing page: {page}")
         title, description = get_meta_tags(page, scraper)
         summary = generate_summary(description)
         data.append({
@@ -116,4 +133,4 @@ def crawler(url: str, limit: int, dst_filepath: str) -> None:
 
     df = pd.DataFrame(data)
     df.to_csv(dst_filepath, index=False, encoding="utf-8-sig")
-    print(f"Data save to {dst_filepath}")
+    logger.info(f"Data saved to {dst_filepath}")
