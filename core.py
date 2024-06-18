@@ -64,9 +64,8 @@ def get_meta_tags(page_url: str, scraper: dict) -> (str, str):
         raise Exception(f"Failed to access {page_url}")
 
     soup = BeautifulSoup(response.content, "html.parser")
-    title = soup.find("title").text if soup.find("title") else "No title"
     title_tag = soup.find("h1", class_="product_title entry-title")
-    title = title_tag.text.strip() if title_tag else title
+    title = title_tag.text.strip() if title_tag else "No title"
     description_tag = soup.find("div", class_="woocommerce-product-details__short-description")
     description = description_tag.text.strip() if description_tag else "No description"
     logger.info(f"Title: {title}, Description: {description}")
